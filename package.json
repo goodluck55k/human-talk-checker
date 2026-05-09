@@ -1,0 +1,9 @@
+{
+  "name": "human-talk-checker",
+  "version": "0.1.0",
+  "private": true,
+  "description": "你会说人话吗 - 一个后续用于单页网站开发的最小前端项目",
+  "scripts": {
+    "start": "node scripts/dev-server.js"
+  }
+}

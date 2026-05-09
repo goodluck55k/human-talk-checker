@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>你会说人话吗</title>
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <main id="app" class="app">
+      <section class="hero" aria-labelledby="page-title">
+        <div class="hero-card">
+          <p class="badge">文案照妖镜</p>
+          <h1 id="page-title">你会说人话吗</h1>
+          <p class="subtitle">检测你的文案到底像不像人话</p>
+
+          <label class="input-label" for="copy-input">待检测文案</label>
+          <textarea
+            id="copy-input"
+            class="copy-input"
+            rows="8"
+            placeholder="把你想检测的话粘进来，比如朋友圈文案、简历自我介绍、AI 生成内容、领导发言。"
+          ></textarea>
+          <div class="example-bar" aria-label="示例输入">
+            <span>试试这些：</span>
+            <button class="example-button" type="button" data-example="朋友圈文案">朋友圈文案</button>
+            <button class="example-button" type="button" data-example="简历自我介绍">简历自我介绍</button>
+            <button class="example-button" type="button" data-example="AI生成文">AI生成文</button>
+            <button class="example-button" type="button" data-example="领导发言">领导发言</button>
+            <button class="example-button" type="button" data-example="小红书文案">小红书文案</button>
+          </div>
+          <p id="input-message" class="input-message" role="status" aria-live="polite"></p>
+
+          <button id="check-button" class="primary-button" type="button">检测一下说不说人话</button>
+
+          <article id="result-card" class="result-card" aria-live="polite" hidden>
+            <div class="result-header">
+              <div>
+                <p class="result-kicker">模拟检测结果</p>
+                <h2>人话率</h2>
+              </div>
+              <div id="result-score" class="score">37%</div>
+            </div>
+
+            <div id="result-tag" class="result-tag">AI味过重型</div>
+            <p id="result-verdict" class="verdict">这段话看起来像是 AI 连夜替领导写的。</p>
+
+            <div class="result-grid">
+              <section class="result-section">
+                <h3>问题分析</h3>
+                <ol id="problem-list">
+                  <li>句子太满，像是在完成任务，不像真实表达。</li>
+                  <li>抽象词太多，但具体信息太少。</li>
+                  <li>语气过于端正，缺少人的情绪和个性。</li>
+                </ol>
+              </section>
+
+              <section class="result-section">
+                <h3>人话急救包</h3>
+                <ol id="suggestion-list">
+                  <li>少用“提升、赋能、打造、助力”这类套话。</li>
+                  <li>把抽象表达改成具体事件。</li>
+                  <li>保留一点真实语气，不要像模板生成。</li>
+                </ol>
+              </section>
+            </div>
+
+            <section class="rewrite-box">
+              <h3>人话版改写</h3>
+              <p id="rewrite-text">“说简单点，这段话可以更直接一点，把你真正想表达的意思说出来，不用包装得太正式。”</p>
+            </section>
+
+            <div class="result-actions">
+              <button id="reset-button" class="secondary-button" type="button">再测一次</button>
+              <button id="copy-result-button" class="copy-button" type="button">复制结果</button>
+            </div>
+            <p id="copy-message" class="copy-message" role="status" aria-live="polite"></p>
+
+            <button id="feedback-toggle-button" class="feedback-toggle-button" type="button">
+              这个结果准不准？我要吐槽
+            </button>
+
+            <form id="feedback-form" class="feedback-form" hidden>
+              <div class="feedback-grid">
+                <fieldset class="feedback-group">
+                  <legend>结果准不准</legend>
+                  <label><input type="radio" name="accuracy" value="很准" required /> 很准</label>
+                  <label><input type="radio" name="accuracy" value="一般" /> 一般</label>
+                  <label><input type="radio" name="accuracy" value="不准" /> 不准</label>
+                </fieldset>
+
+                <fieldset class="feedback-group">
+                  <legend>毒舌程度</legend>
+                  <label><input type="radio" name="roastLevel" value="太温柔了" required /> 太温柔了</label>
+                  <label><input type="radio" name="roastLevel" value="刚好" /> 刚好</label>
+                  <label><input type="radio" name="roastLevel" value="太毒舌了" /> 太毒舌了</label>
+                </fieldset>
+
+                <fieldset class="feedback-group">
+                  <legend>修改建议是否有用</legend>
+                  <label><input type="radio" name="suggestionUsefulness" value="有用" required /> 有用</label>
+                  <label><input type="radio" name="suggestionUsefulness" value="一般" /> 一般</label>
+                  <label><input type="radio" name="suggestionUsefulness" value="没用" /> 没用</label>
+                </fieldset>
+
+                <fieldset class="feedback-group">
+                  <legend>是否愿意分享</legend>
+                  <label><input type="radio" name="shareWillingness" value="愿意" required /> 愿意</label>
+                  <label><input type="radio" name="shareWillingness" value="不愿意" /> 不愿意</label>
+                </fieldset>
+              </div>
+
+              <label class="feedback-text-label" for="feedback-text">文字反馈</label>
+              <textarea
+                id="feedback-text"
+                name="comment"
+                class="feedback-text"
+                rows="4"
+                placeholder="哪里不准、哪里不好笑、哪里看着像假的，都可以骂两句。"
+              ></textarea>
+
+              <button class="feedback-submit-button" type="submit">提交吐槽</button>
+            </form>
+            <p id="feedback-message" class="feedback-message" role="status" aria-live="polite"></p>
+          </article>
+
+          <button id="view-feedback-button" class="local-feedback-link" type="button">查看本地反馈</button>
+        </div>
+
+        <section id="feedback-dashboard" class="feedback-dashboard" aria-labelledby="feedback-dashboard-title" hidden>
+          <div class="dashboard-header">
+            <div>
+              <p class="badge">本地反馈</p>
+              <h2 id="feedback-dashboard-title">反馈统计</h2>
+            </div>
+            <button id="back-to-checker-button" class="secondary-button dashboard-back-button" type="button">
+              返回检测页
+            </button>
+          </div>
+
+          <div class="stats-summary">
+            <div class="stat-card stat-card-total">
+              <span>总反馈数量</span>
+              <strong id="total-feedback-count">0</strong>
+            </div>
+          </div>
+
+          <div id="feedback-stats-grid" class="feedback-stats-grid"></div>
+
+          <section class="feedback-list-section">
+            <h3>用户文字反馈</h3>
+            <div id="feedback-list" class="feedback-list"></div>
+          </section>
+        </section>
+      </section>
+    </main>
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
