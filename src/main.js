@@ -10,6 +10,8 @@ const resultVerdict = document.querySelector("#result-verdict");
 const problemList = document.querySelector("#problem-list");
 const suggestionList = document.querySelector("#suggestion-list");
 const rewriteText = document.querySelector("#rewrite-text");
+const compareOriginalText = document.querySelector("#compare-original-text");
+const compareRewriteText = document.querySelector("#compare-rewrite-text");
 const resetButton = document.querySelector("#reset-button");
 const copyResultButton = document.querySelector("#copy-result-button");
 const copyMessage = document.querySelector("#copy-message");
@@ -163,6 +165,7 @@ const officialeseWords = [
 ];
 const vagueInspirationalWords = ["生活", "赶路", "感受", "风景", "平凡", "日子", "属于自己", "光", "愿我们"];
 const promoHypeWords = ["夸张", "方法", "状态", "不一样", "姐妹们", "一定要试试", "谁用谁知道", "真的不是"];
+const shortNaturalWords = ["我", "今天", "真的", "服了", "累", "难用", "好烦", "崩溃", "无语", "开心", "喜欢", "讨厌", "想", "怎么"];
 const exampleTexts = {
   朋友圈文案:
     "最近真的越来越觉得，生活不是为了赶路，而是为了感受路上的风景。愿我们都能在平凡的日子里，找到属于自己的光。",
@@ -181,7 +184,7 @@ const resultCopy = [
     tag: "人话大师型",
     variants: [
       {
-        roastTitle: "这段话挺像真人说的，甚至有点不像被 KPI 追着写出来的。",
+        roastTitle: "这段话人味在线，像是从嘴里说出来的，不是从模板里挤出来的。",
         problems: [
           "表达比较直接，没有把一句话包装成项目申报书。",
           "能看出具体语境，读者不用靠猜来补剧情。",
@@ -195,7 +198,7 @@ const resultCopy = [
         rewrite: "“这段话已经挺清楚了，再补一个具体例子，会更像你真的经历过。”"
       },
       {
-        roastTitle: "这段文字的人味还挺足，AI 看了都想报名语言康复班。",
+        roastTitle: "这段文字挺会做人，AI 看了都想偷两句去装自然。",
         problems: [
           "信息表达比较自然，没有明显套话堆叠。",
           "句子之间有正常停顿，不像一路踩油门。",
@@ -209,7 +212,7 @@ const resultCopy = [
         rewrite: "“这段话基本不用大修，把最想说的那句提前，再加个具体细节就够了。”"
       },
       {
-        roastTitle: "这段话已经会走路了，不需要再穿西装打领带假装成熟。",
+        roastTitle: "这段话已经很像人话了，没必要再穿西装给句子上班。",
         problems: [
           "整体没有明显官话味，读起来比较顺。",
           "表达有真实落点，不是只会说正确废话。",
@@ -229,7 +232,7 @@ const resultCopy = [
     tag: "基本会说人话型",
     variants: [
       {
-        roastTitle: "能看懂，也像人说的，就是偶尔露出一点会议室味。",
+        roastTitle: "能看懂，也像人说的，就是偶尔飘出一点会议室空调味。",
         problems: [
           "有些表达偏正式，但还没严重到需要抢救。",
           "具体信息有一点，不过还可以更扎实。",
@@ -243,7 +246,7 @@ const resultCopy = [
         rewrite: "“说简单点，这段话已经能表达意思了，再少一点套话、多一点具体事，就更自然。”"
       },
       {
-        roastTitle: "这段话大体像人话，但有几句已经把脚伸进汇报材料里了。",
+        roastTitle: "这段话大体还行，但有几句已经开始偷偷打开 PPT 了。",
         problems: [
           "整体意思能成立，但有些词在假装很专业。",
           "部分句子信息不够具体，读者只能点头但记不住。",
@@ -257,7 +260,7 @@ const resultCopy = [
         rewrite: "“这段话可以更直接：先说你遇到什么，再说你打算怎么做，别绕太多。”"
       },
       {
-        roastTitle: "这段文字还行，属于老师不会打低分、同学不会转发的类型。",
+        roastTitle: "这段文字不差，但属于看完会点头，转头就忘的那种。",
         problems: [
           "表达稳定，但记忆点还不够强。",
           "有些句子比较安全，安全到有点无聊。",
@@ -277,7 +280,7 @@ const resultCopy = [
     tag: "轻微套话型",
     variants: [
       {
-        roastTitle: "这段话像真人写的初稿，但被 PPT 熏过一遍。",
+        roastTitle: "这段话像真人写的，但中途被 PPT 抓去团建了一下。",
         problems: [
           "套话词开始冒头，信息密度被稀释了。",
           "抽象表达偏多，读者不太知道具体发生了什么。",
@@ -291,7 +294,7 @@ const resultCopy = [
         rewrite: "“说简单点，别急着包装，先把具体发生了什么、你想表达什么讲清楚。”"
       },
       {
-        roastTitle: "这段话不是不能看，是看着像被简历模板摸了一把头。",
+        roastTitle: "这段话不是不能看，是被简历模板拍了拍肩，说你成熟点。",
         problems: [
           "表达有点泛，像很多场合都能用。",
           "关键词不少，但真正有用的信息偏少。",
@@ -305,7 +308,7 @@ const resultCopy = [
         rewrite: "“简单说，把万能句删掉，留下具体经历和真实想法，这段话会立刻像你写的。”"
       },
       {
-        roastTitle: "这段文字有点像刚学会职场表达，正在努力把人话藏起来。",
+        roastTitle: "这段文字有点像刚学会职场黑话，急着给人话办离职。",
         problems: [
           "一些词听起来高级，但没有提供新信息。",
           "句子重点不够突出，读完容易只记得很努力。",
@@ -325,7 +328,7 @@ const resultCopy = [
     tag: "AI味过重型",
     variants: [
       {
-        roastTitle: "这段话看起来像是 AI 连夜替领导写的。",
+        roastTitle: "这段话像 AI 熬夜赶出来的，咖啡喝了三杯，人味忘了加。",
         problems: [
           "句子太满，像是在完成任务，不像真实表达。",
           "抽象词太多，但具体信息太少。",
@@ -339,7 +342,7 @@ const resultCopy = [
         rewrite: "“说简单点，这段话可以更直接一点，把你真正想表达的意思说出来，不用包装得太正式。”"
       },
       {
-        roastTitle: "这段文字 AI 味有点冲，像刚从生成按钮旁边端出来的。",
+        roastTitle: "这段文字 AI 味有点冲，像刚点完生成还没来得及散味。",
         problems: [
           "表达过于完整，完整到不像临时起意的人说的。",
           "很多词负责撑场面，真正负责传递信息的少。",
@@ -353,7 +356,7 @@ const resultCopy = [
         rewrite: "“别铺垫太多，直接说发生了什么、你怎么看、下一步想怎么做。”"
       },
       {
-        roastTitle: "这段话像 AI 写完还自己鼓掌，问题是人类还没看懂。",
+        roastTitle: "这段话像 AI 写完自己点了个赞，但人类读者还在加载中。",
         problems: [
           "句子结构太规整，缺少自然表达的松弛感。",
           "概念密度高，但具体画面少。",
@@ -373,7 +376,7 @@ const resultCopy = [
     tag: "领导废话型",
     variants: [
       {
-        roastTitle: "这段话的含人量偏低，像会议纪要和口号生了个孩子。",
+        roastTitle: "这段话的含人量偏低，像会议纪要穿上口号外套出门了。",
         problems: [
           "套话和抽象词过多，读完很难抓住重点。",
           "标点和停顿不足，像一口气把墙上的标语念完。",
@@ -387,7 +390,7 @@ const resultCopy = [
         rewrite: "“说简单点，先别讲战略和价值，直接说你做了什么、遇到什么问题、希望别人怎么做。”"
       },
       {
-        roastTitle: "这段话像在开会，但会议室里没有一个人敢问重点是什么。",
+        roastTitle: "这段话像开了半小时会，最后只留下四个字：听着很忙。",
         problems: [
           "概念太多，具体信息几乎被埋住了。",
           "表达像口号集合，读完只剩一种很忙的感觉。",
@@ -401,7 +404,7 @@ const resultCopy = [
         rewrite: "“别先讲大方向，先说清楚：谁遇到了什么问题，你做了什么，现在需要什么。”"
       },
       {
-        roastTitle: "这段文字已经不是不像人话，是像在给空气做战略部署。",
+        roastTitle: "这段文字已经不是不像人话，是在给空气安排年度重点工作。",
         problems: [
           "内容过度包装，真实意思被层层包住。",
           "大量词语听起来正确，但落不到具体事情上。",
@@ -494,9 +497,53 @@ function splitSentences(text) {
     .filter(Boolean);
 }
 
+function calculateShortTextScore(text, length, noise) {
+  const clicheCount = countMatches(text, clicheWords);
+  const officialeseCount = countMatches(text, officialeseWords);
+  const aiPhraseCount = countMatches(text, aiPhrases) + countPatternMatches(text, aiPatterns);
+  const abstractCount = countMatches(text, abstractWords);
+  const concreteDetailCount = countMatches(text, concreteDetailWords);
+  const shortNaturalCount = countMatches(text, shortNaturalWords);
+  const hasQuestionOrExclamation = /[？！?!]/.test(text);
+  const badSignalCount = clicheCount + officialeseCount * 2 + aiPhraseCount * 2 + abstractCount;
+
+  let score = 68 + Math.min(shortNaturalCount * 6, 18) + (hasQuestionOrExclamation ? 4 : 0) + noise - 2;
+
+  score -= clicheCount * 16;
+  score -= officialeseCount * 18;
+  score -= aiPhraseCount * 14;
+  score -= abstractCount * 6;
+
+  if (concreteDetailCount === 0 && shortNaturalCount === 0) {
+    score -= 12;
+  }
+
+  if (badSignalCount >= 3) {
+    score = Math.min(score, 32 + noise);
+  } else if (badSignalCount >= 2) {
+    score = Math.min(score, 45 + noise);
+  }
+
+  if (shortNaturalCount >= 2 && badSignalCount === 0) {
+    score = Math.max(score, 72 + noise);
+  }
+
+  if (length <= 4) {
+    score = clamp(score, 35, 82);
+  }
+
+  return clamp(Math.round(score), 12, 88);
+}
+
 function calculateHumanScore(text) {
   const compactText = text.replace(/\s/g, "");
   const length = compactText.length;
+  const noise = stableNoise(text);
+
+  if (length < 20) {
+    return calculateShortTextScore(text, length, noise);
+  }
+
   const sentences = splitSentences(text);
   const punctuationCount = (text.match(/[，。！？、；：,.!?;:]/g) || []).length;
   const clicheCount = countMatches(text, clicheWords);
@@ -510,7 +557,6 @@ function calculateHumanScore(text) {
   const promoHypeCount = countMatches(text, promoHypeWords);
   const averageSentenceLength = sentences.length ? length / sentences.length : length;
   const punctuationRatio = length ? punctuationCount / length : 0;
-  const noise = stableNoise(text);
   const abstractDensity = length ? abstractCount / Math.max(length / 20, 1) : 0;
   const aiSignalCount = aiPhraseCount + clicheCount + officialeseCount;
   const naturalBonus = aiSignalCount >= 2 ? Math.min(concreteCount, 3) : Math.min(concreteCount * 2, 7);
@@ -779,8 +825,22 @@ function renderResult(text) {
   renderList(problemList, copy.problems);
   renderList(suggestionList, copy.suggestions);
 
+  if (text.replace(/\s/g, "").length < 20 && problemList) {
+    const note = document.createElement("li");
+    note.textContent = "文本较短，结果仅供参考，建议输入更完整的一段话。";
+    problemList.append(note);
+  }
+
   if (rewriteText) {
     rewriteText.textContent = copy.rewrite;
+  }
+
+  if (compareOriginalText) {
+    compareOriginalText.textContent = text;
+  }
+
+  if (compareRewriteText) {
+    compareRewriteText.textContent = copy.rewrite;
   }
 
   feedbackForm?.reset();
