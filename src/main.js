@@ -27,6 +27,7 @@ const feedbackList = document.querySelector("#feedback-list");
 let currentResult = null;
 let currentInputText = "";
 const feedbackStorageKey = "humanTalkChecker.feedback";
+const externalFeedbackUrl = "https://docs.qq.com/form/page/DRkFDUXdSeW1YaEJ0";
 const statGroups = [
   {
     title: "结果准不准",
@@ -419,6 +420,28 @@ const resultCopy = [
 
 if (app) {
   app.dataset.ready = "true";
+}
+
+function initializeViewState() {
+  heroCard?.removeAttribute("hidden");
+  resultCard?.setAttribute("hidden", "");
+  feedbackForm?.setAttribute("hidden", "");
+  feedbackDashboard?.setAttribute("hidden", "");
+  feedbackDashboard?.classList.remove("is-visible");
+  viewFeedbackButton?.setAttribute("hidden", "");
+  feedbackToggleButton?.removeAttribute("hidden");
+
+  if (inputMessage) {
+    inputMessage.textContent = "";
+  }
+
+  if (copyMessage) {
+    copyMessage.textContent = "";
+  }
+
+  if (feedbackMessage) {
+    feedbackMessage.textContent = "";
+  }
 }
 
 exampleButtons.forEach((button) => {
@@ -840,12 +863,13 @@ copyResultButton?.addEventListener("click", async () => {
 });
 
 feedbackToggleButton?.addEventListener("click", () => {
-  feedbackForm?.removeAttribute("hidden");
-  feedbackToggleButton.setAttribute("hidden", "");
+  feedbackForm?.setAttribute("hidden", "");
 
   if (feedbackMessage) {
-    feedbackMessage.textContent = "";
+    feedbackMessage.textContent = "感谢吐槽，马上送你去骂产品经理。";
   }
+
+  window.open(externalFeedbackUrl, "_blank", "noopener,noreferrer");
 });
 
 feedbackForm?.addEventListener("submit", (event) => {
@@ -885,11 +909,15 @@ viewFeedbackButton?.addEventListener("click", () => {
   renderFeedbackDashboard();
   heroCard?.setAttribute("hidden", "");
   feedbackDashboard?.removeAttribute("hidden");
+  feedbackDashboard?.classList.add("is-visible");
   feedbackDashboard?.scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
 backToCheckerButton?.addEventListener("click", () => {
   feedbackDashboard?.setAttribute("hidden", "");
+  feedbackDashboard?.classList.remove("is-visible");
   heroCard?.removeAttribute("hidden");
   heroCard?.scrollIntoView({ behavior: "smooth", block: "start" });
 });
+
+initializeViewState();

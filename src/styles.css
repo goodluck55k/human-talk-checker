@@ -528,12 +528,17 @@ h1 {
 }
 
 .feedback-dashboard {
+  display: none;
   width: 100%;
   padding: clamp(24px, 5vw, 42px);
   border: 3px solid #0b0b0b;
   border-radius: 8px;
   background: #ffffff;
   box-shadow: 12px 12px 0 #0b0b0b;
+}
+
+.feedback-dashboard.is-visible {
+  display: block;
 }
 
 .dashboard-header {
@@ -744,4 +749,8 @@ h1 {
   .feedback-stats-grid {
     grid-template-columns: 1fr;
   }
+}
+
+[hidden] {
+  display: none !important;
 }
