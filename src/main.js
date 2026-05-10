@@ -28,6 +28,8 @@ let currentResult = null;
 let currentInputText = "";
 const feedbackStorageKey = "humanTalkChecker.feedback";
 const externalFeedbackUrl = "https://docs.qq.com/form/page/DRkFDUXdSeW1YaEJ0";
+const deepSeekFunctionUrl = "/.netlify/functions/check-human-talk";
+const deepSeekTimeoutMs = 10000;
 const statGroups = [
   {
     title: "结果准不准",
@@ -797,30 +799,108 @@ function renderFeedbackDashboard() {
   );
 }
 
-function renderResult(text) {
+function createRuleResult(text) {
   const score = calculateHumanScore(text);
   const result = getResultByScore(score);
   const copy = getRandomVariant(result.variants);
-  currentInputText = text;
-  currentResult = {
+
+  return {
     score,
     typeLabel: result.tag,
-    roastTitle: copy.roastTitle
+    roastTitle: copy.roastTitle,
+    problems: result.explanations,
+    suggestions: result.suggestions,
+    rewrite: copy.rewrite
+  };
+}
+
+function normalizeApiResult(value) {
+  if (!value || typeof value !== "object") {
+    throw new Error("API result 缺失");
+  }
+
+  const score = Number(value.score);
+
+  if (!Number.isFinite(score)) {
+    throw new Error("API score 格式不合法");
+  }
+
+  if (!Array.isArray(value.problems) || !Array.isArray(value.suggestions)) {
+    throw new Error("API problems 或 suggestions 格式不合法");
+  }
+
+  const roastTitleValue = typeof value.roastTitle === "string" ? value.roastTitle.trim() : "";
+  const typeLabelValue = typeof value.typeLabel === "string" ? value.typeLabel.trim() : "";
+  const explanationValue = typeof value.explanation === "string" ? value.explanation.trim() : "";
+  const rewriteValue = typeof value.rewrite === "string" ? value.rewrite.trim() : "";
+  const problems = value.problems.map((item) => String(item).trim()).filter(Boolean);
+  const suggestions = value.suggestions.map((item) => String(item).trim()).filter(Boolean);
+
+  if (!roastTitleValue || !typeLabelValue || !explanationValue || !rewriteValue || !problems.length || !suggestions.length) {
+    throw new Error("API result 必要字段不完整");
+  }
+
+  return {
+    score: Math.max(0, Math.min(100, Math.round(score))),
+    typeLabel: typeLabelValue,
+    roastTitle: roastTitleValue,
+    problems: [explanationValue, ...problems],
+    suggestions,
+    rewrite: rewriteValue
+  };
+}
+
+async function fetchDeepSeekResult(text) {
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), deepSeekTimeoutMs);
+
+  try {
+    const response = await fetch(deepSeekFunctionUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json; charset=utf-8"
+      },
+      body: JSON.stringify({ text }),
+      signal: controller.signal
+    });
+
+    if (!response.ok) {
+      throw new Error(`Function 请求失败：${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (!data?.ok) {
+      throw new Error(data?.error || "Function 返回失败");
+    }
+
+    return normalizeApiResult(data.result);
+  } finally {
+    window.clearTimeout(timeoutId);
+  }
+}
+
+function renderResult(text, result) {
+  currentInputText = text;
+  currentResult = {
+    score: result.score,
+    typeLabel: result.typeLabel,
+    roastTitle: result.roastTitle
   };
 
   if (resultScore) {
-    resultScore.textContent = `${score}%`;
+    resultScore.textContent = `${result.score}%`;
   }
 
   if (resultTag) {
-    resultTag.textContent = result.tag;
+    resultTag.textContent = result.typeLabel;
   }
 
   if (roastTitle) {
-    roastTitle.textContent = copy.roastTitle;
+    roastTitle.textContent = result.roastTitle;
   }
 
-  renderList(problemList, result.explanations);
+  renderList(problemList, result.problems);
   renderList(suggestionList, result.suggestions);
 
   if (text.replace(/\s/g, "").length < 20 && problemList) {
@@ -830,7 +910,7 @@ function renderResult(text) {
   }
 
   if (rewriteText) {
-    rewriteText.textContent = copy.rewrite;
+    rewriteText.textContent = result.rewrite;
   }
 
   feedbackForm?.reset();
@@ -842,7 +922,7 @@ function renderResult(text) {
   }
 }
 
-checkButton?.addEventListener("click", () => {
+checkButton?.addEventListener("click", async () => {
   const text = copyInput?.value.trim() || "";
 
   if (!text) {
@@ -855,10 +935,35 @@ checkButton?.addEventListener("click", () => {
   }
 
   if (inputMessage) {
-    inputMessage.textContent = "";
+    inputMessage.textContent = "正在检测这段话的人话含量……";
   }
 
-  renderResult(text);
+  resultCard?.setAttribute("hidden", "");
+
+  if (checkButton) {
+    checkButton.disabled = true;
+  }
+
+  let result;
+  let usedFallback = false;
+
+  try {
+    result = await fetchDeepSeekResult(text);
+  } catch {
+    result = createRuleResult(text);
+    usedFallback = true;
+  }
+
+  renderResult(text, result);
+
+  if (inputMessage) {
+    inputMessage.textContent = usedFallback ? "AI 分析开小差了，先用本地规则给你测一下。" : "";
+  }
+
+  if (checkButton) {
+    checkButton.disabled = false;
+  }
+
   resultCard?.removeAttribute("hidden");
   resultCard?.scrollIntoView({ behavior: "smooth", block: "nearest" });
 });
