@@ -270,9 +270,10 @@ h1 {
   font-weight: 900;
 }
 
-.verdict {
+.roast-title {
   margin: 18px 0 0;
   max-width: 680px;
+  color: #ffffff;
   font-size: clamp(22px, 4vw, 34px);
   font-weight: 900;
   line-height: 1.32;
@@ -286,8 +287,7 @@ h1 {
 }
 
 .result-section,
-.rewrite-box,
-.compare-box {
+.rewrite-box {
   border: 2px solid rgba(255, 255, 255, 0.28);
   border-radius: 8px;
   background: #181818;
@@ -298,8 +298,7 @@ h1 {
 }
 
 .result-section h3,
-.rewrite-box h3,
-.compare-box h3 {
+.rewrite-box h3 {
   color: #d8ff3e;
   font-size: 18px;
 }
@@ -327,52 +326,6 @@ h1 {
   font-size: clamp(18px, 3vw, 24px);
   font-weight: 800;
   line-height: 1.55;
-}
-
-.compare-box {
-  margin-top: 18px;
-  padding: 22px;
-}
-
-.compare-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-  margin-top: 14px;
-}
-
-.compare-panel {
-  min-height: 160px;
-  padding: 16px;
-  border: 2px solid rgba(255, 255, 255, 0.28);
-  border-radius: 8px;
-}
-
-.compare-panel span {
-  display: inline-flex;
-  margin-bottom: 10px;
-  padding: 4px 8px;
-  border: 2px solid currentColor;
-  font-size: 13px;
-  font-weight: 900;
-}
-
-.compare-panel p {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 800;
-  line-height: 1.6;
-  overflow-wrap: anywhere;
-}
-
-.compare-before {
-  background: #252525;
-  color: #d7d7d7;
-}
-
-.compare-after {
-  background: #d8ff3e;
-  color: #0b0b0b;
 }
 
 .result-actions {
@@ -774,10 +727,6 @@ h1 {
   }
 
   .result-actions {
-    grid-template-columns: 1fr;
-  }
-
-  .compare-grid {
     grid-template-columns: 1fr;
   }
 
